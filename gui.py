@@ -222,8 +222,13 @@ if __name__ == '__main__':
 
                 env.display()
 
-                c.delete(marker[env.traveler.row][env.traveler.col])
-                marker[env.traveler.row][env.traveler.col] = None
+                if (Point(env.traveler.row, env.traveler.col) not in obstacles) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_low) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_mid) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_high) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_extreme):
+                    c.delete(marker[env.traveler.row][env.traveler.col])
+                    marker[env.traveler.row][env.traveler.col] = None
                 action = agent.choose_action(cur_state)
 
                 next_state, reward = env.move(action)
