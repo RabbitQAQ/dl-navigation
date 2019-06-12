@@ -57,7 +57,7 @@ if __name__ == '__main__':
         row = int(event.y // row_height)
         # If the tile is not filled, create a rectangle
         if not tiles[row][col] and currentMode == Operation.OBSTACLE:
-            c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
+            marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                (row + 1) * row_height, fill="black")
             tiles[row][col] = -1000
             obstacles.append(Point(row, col))
@@ -102,11 +102,16 @@ if __name__ == '__main__':
             c.delete(marker[row][col])
             marker[row][col] = None
             tiles[row][col] = None
-            obstacles.remove(Point(row, col))
-            crime_low.remove(Point(row, col))
-            crime_mid.remove(Point(row, col))
-            crime_high.remove(Point(row, col))
-            crime_extreme.remove(Point(row, col))
+            if Point(row, col) in obstacles:
+                obstacles.remove(Point(row, col))
+            if Point(row, col) in crime_low:
+                crime_low.remove(Point(row, col))
+            if Point(row, col) in crime_mid:
+                crime_mid.remove(Point(row, col))
+            if Point(row, col) in crime_high:
+                crime_high.remove(Point(row, col))
+            if Point(row, col) in crime_extreme:
+                crime_extreme.remove(Point(row, col))
         c.update()
 
 
