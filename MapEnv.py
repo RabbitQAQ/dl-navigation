@@ -98,6 +98,9 @@ class Point:
     def equal(self, other_point):
         return self.row == other_point.row and self.col == other_point.col
 
+    def __eq__(self, other):
+        return self.row == other.row and self.col == other.col
+
     def toString(self):
         return "({},{})".format(str(self.row), str(self.col))
 

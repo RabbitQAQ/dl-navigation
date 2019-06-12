@@ -45,6 +45,18 @@ if __name__ == '__main__':
     c.pack()
     col_width = -1
     row_height = -1
+    # Label of status
+    statusLabel = StringVar()
+    Label(root, textvariable=statusLabel).pack()
+    succeedLabel = StringVar()
+    Label(root, textvariable=succeedLabel).pack()
+    failedLabel = StringVar()
+    Label(root, textvariable=failedLabel).pack()
+
+    statusLabel.set("Not Started")
+    succeedLabel.set("Succeed Steps: ")
+    failedLabel.set("Failed Steps: ")
+
     def mark(event):
         global traveler
         global destination
@@ -58,41 +70,41 @@ if __name__ == '__main__':
         # If the tile is not filled, create a rectangle
         if not tiles[row][col] and currentMode == Operation.OBSTACLE:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                               (row + 1) * row_height, fill="black")
+                                                  (row + 1) * row_height, fill="black")
             tiles[row][col] = -1000
             obstacles.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_1:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                               (row + 1) * row_height, fill="blue")
+                                                  (row + 1) * row_height, fill="blue")
             tiles[row][col] = -30
             crime_low.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_2:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                               (row + 1) * row_height, fill="yellow")
+                                                  (row + 1) * row_height, fill="yellow")
             tiles[row][col] = -100
             crime_mid.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_3:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                               (row + 1) * row_height, fill="orange")
+                                                  (row + 1) * row_height, fill="orange")
             tiles[row][col] = -400
             crime_high.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_4:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                               (row + 1) * row_height, fill="red")
+                                                  (row + 1) * row_height, fill="red")
             tiles[row][col] = -800
             crime_extreme.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.START:
             if traveler.row == -1 and traveler.col == -1:
                 traveler = Point(row, col)
                 marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                                   (row + 1) * row_height, fill="green")
+                                                      (row + 1) * row_height, fill="green")
                 tiles[row][col] = 1
 
         if not tiles[row][col] and currentMode == Operation.END:
             if destination.row == -1 and destination.col == -1:
                 destination = Point(row, col)
                 marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
-                                   (row + 1) * row_height, fill="green")
+                                                      (row + 1) * row_height, fill="green")
                 tiles[row][col] = 1000
         if tiles[row][col] and currentMode == Operation.ERASER:
             if traveler.row == row and traveler.col == col:
@@ -158,6 +170,7 @@ if __name__ == '__main__':
         global currentMode
         currentMode = Operation.END
 
+
     def startLearningBtnHandler(event):
         print("wow")
         refresh_interval = 0.01
@@ -201,6 +214,11 @@ if __name__ == '__main__':
 
             while True:
                 step_counter += 1
+                statusLabel.set("Episode: " + str(eps) + ", Step: " + str(step_counter))
+                succeedText = str(successful_routines).strip('[]').split(',')
+                failedText = str(failed_routines).strip('[]').split(',')
+                succeedLabel.set("Succeed Routines: " + str(succeedText[len(succeedText) - 5 if len(succeedText) > 5 else 0:len(succeedText)]))
+                failedLabel.set("Failed Routines: " + str(failedText[len(failedText) - 5 if len(failedText) > 5 else 0:len(failedText)]))
 
                 env.display()
 
@@ -209,9 +227,16 @@ if __name__ == '__main__':
                 action = agent.choose_action(cur_state)
 
                 next_state, reward = env.move(action)
-                marker[env.traveler.row][env.traveler.col] = c.create_rectangle(env.traveler.col * col_width, env.traveler.row * row_height,
-                                                                                (env.traveler.col + 1) * col_width,
-                                                                                (env.traveler.row + 1) * row_height, fill="green")
+                if (Point(env.traveler.row, env.traveler.col) not in obstacles) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_low) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_mid) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_high) and (
+                        Point(env.traveler.row, env.traveler.col) not in crime_extreme):
+                    marker[env.traveler.row][env.traveler.col] = c.create_rectangle(env.traveler.col * col_width,
+                                                                                    env.traveler.row * row_height,
+                                                                                    (env.traveler.col + 1) * col_width,
+                                                                                    (env.traveler.row + 1) * row_height,
+                                                                                    fill="green")
                 c.update()
 
                 agent.learn(
