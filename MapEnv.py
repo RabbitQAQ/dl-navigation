@@ -24,8 +24,6 @@ class MapEnv:
             self.obstacles = []
 
     def move(self, action):
-        # print(action)
-
         if action == MOVE_LEFT:
             if self.worker.col > 0:
                 self.worker.col -= 1
