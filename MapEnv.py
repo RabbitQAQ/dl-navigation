@@ -11,8 +11,8 @@ class MapEnv:
         self.max_row = max_row
         self.max_col = max_col
         self.init_worker = traveler.clone()
-        self.worker = traveler
-        self.treasure = destination
+        self.traveler = traveler
+        self.destination = destination
         self.crime_high = crime_high
         self.crime_mid = crime_mid
         self.crime_low = crime_low
@@ -29,53 +29,53 @@ class MapEnv:
 
     def move(self, action):
         if action == MOVE_LEFT:
-            if self.worker.col > 0:
-                self.worker.col -= 1
+            if self.traveler.col > 0:
+                self.traveler.col -= 1
         elif action == MOVE_RIGHT:
-            if self.worker.col < self.max_col - 1:
-                self.worker.col += 1
+            if self.traveler.col < self.max_col - 1:
+                self.traveler.col += 1
         elif action == MOVE_UP:
-            if self.worker.row > 0:
-                self.worker.row -= 1
+            if self.traveler.row > 0:
+                self.traveler.row -= 1
         elif action == MOVE_DOWN:
-            if self.worker.row < self.max_row - 1:
-                self.worker.row += 1
+            if self.traveler.row < self.max_row - 1:
+                self.traveler.row += 1
         else:
             raise Exception('Not supported action: {}'.format(action))
 
         return self.feedback()
 
     def feedback(self):
-        state = self.worker.toString()
+        state = self.traveler.toString()
         reward = 0
-        if self.worker.equal(self.treasure):
+        if self.traveler.equal(self.destination):
             reward = 1000
         for low in self.crime_low:
-            if self.worker.equal(low):
+            if self.traveler.equal(low):
                 reward -= 30
         for mid in self.crime_mid:
-            if self.worker.equal(mid):
+            if self.traveler.equal(mid):
                 reward -= 100
         for high in self.crime_high:
-            if self.worker.equal(high):
+            if self.traveler.equal(high):
                 reward -= 400
         for extreme in self.crime_extreme:
-            if self.worker.equal(extreme):
+            if self.traveler.equal(extreme):
                 reward -= 800
         for obstacle in self.obstacles:
-            if self.worker.equal(obstacle):
+            if self.traveler.equal(obstacle):
                 reward = -1000
         return state, reward
 
     def reset(self):
-        self.worker = self.init_worker.clone()
-        return self.worker.toString()
+        self.traveler = self.init_worker.clone()
+        return self.traveler.toString()
 
     def display(self):
         os.system('clear')
         arr = np.zeros((self.max_row, self.max_col))
-        arr[self.treasure.row][self.treasure.col] = 8
-        arr[self.worker.row][self.worker.col] = 1
+        arr[self.destination.row][self.destination.col] = 8
+        arr[self.traveler.row][self.traveler.col] = 1
         for obstacle in self.obstacles:
             arr[obstacle.row][obstacle.col] = 7
         for low in self.crime_low:
@@ -87,7 +87,7 @@ class MapEnv:
         for extreme in self.crime_extreme:
             arr[extreme.row][extreme.col] = -4
         print(arr)
-        time.sleep(self.refresh_interval)
+        #time.sleep(self.refresh_interval)
 
 
 class Point:

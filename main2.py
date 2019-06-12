@@ -27,6 +27,10 @@ if __name__ == '__main__':
     traveler = Point(-1, -1)
     destination = Point(-1, -1)
     obstacles = []
+    crime_low = []
+    crime_mid = []
+    crime_high = []
+    crime_extreme = []
     startLearning = False
     # =================== GUI Mark Tool ====================
     # Create a grid of None to store the references to the tiles
@@ -52,28 +56,31 @@ if __name__ == '__main__':
         col = int(event.x // col_width)
         row = int(event.y // row_height)
         # If the tile is not filled, create a rectangle
-        # print(currentMode)
         if not tiles[row][col] and currentMode == Operation.OBSTACLE:
             c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                (row + 1) * row_height, fill="black")
-            tiles[row][col] = -10000
+            tiles[row][col] = -1000
             obstacles.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_1:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                (row + 1) * row_height, fill="blue")
-            tiles[row][col] = -1
+            tiles[row][col] = -30
+            crime_low.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_2:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                (row + 1) * row_height, fill="yellow")
-            tiles[row][col] = -2
+            tiles[row][col] = -100
+            crime_mid.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_3:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                (row + 1) * row_height, fill="orange")
-            tiles[row][col] = -3
+            tiles[row][col] = -400
+            crime_high.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.DANGER_4:
             marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                (row + 1) * row_height, fill="red")
-            tiles[row][col] = -4
+            tiles[row][col] = -800
+            crime_extreme.append(Point(row, col))
         if not tiles[row][col] and currentMode == Operation.START:
             if traveler.row == -1 and traveler.col == -1:
                 traveler = Point(row, col)
@@ -86,7 +93,7 @@ if __name__ == '__main__':
                 destination = Point(row, col)
                 marker[row][col] = c.create_rectangle(col * col_width, row * row_height, (col + 1) * col_width,
                                    (row + 1) * row_height, fill="green")
-                tiles[row][col] = 10000
+                tiles[row][col] = 1000
         if tiles[row][col] and currentMode == Operation.ERASER:
             if traveler.row == row and traveler.col == col:
                 traveler = Point(-1, -1)
@@ -96,6 +103,10 @@ if __name__ == '__main__':
             marker[row][col] = None
             tiles[row][col] = None
             obstacles.remove(Point(row, col))
+            crime_low.remove(Point(row, col))
+            crime_mid.remove(Point(row, col))
+            crime_high.remove(Point(row, col))
+            crime_extreme.remove(Point(row, col))
         c.update()
 
 
@@ -146,7 +157,7 @@ if __name__ == '__main__':
         print("wow")
         refresh_interval = 0.01
         # Number of iterations
-        episode = 100
+        episode = 200
         # QLearning settings
         epsilon = 0.9
         learning_rate = 0.05
@@ -160,7 +171,11 @@ if __name__ == '__main__':
             traveler=traveler,
             destination=destination,
             obstacles=obstacles,
-            refresh_interval=refresh_interval
+            refresh_interval=refresh_interval,
+            crime_low=crime_low,
+            crime_mid=crime_mid,
+            crime_high=crime_high,
+            crime_extreme=crime_extreme,
         )
         # Init learning agent
         agent = QLAgent(
@@ -184,16 +199,14 @@ if __name__ == '__main__':
 
                 env.display()
 
-                c.delete(marker[env.worker.row][env.worker.col])
-                marker[env.worker.row][env.worker.col] = None
+                c.delete(marker[env.traveler.row][env.traveler.col])
+                marker[env.traveler.row][env.traveler.col] = None
                 action = agent.choose_action(cur_state)
 
                 next_state, reward = env.move(action)
-                print(col_width)
-                print(row_height)
-                marker[env.worker.row][env.worker.col] = c.create_rectangle(env.worker.col * col_width, env.worker.row * row_height,
-                                   (env.worker.col + 1) * col_width,
-                                   (env.worker.row + 1) * row_height, fill="green")
+                marker[env.traveler.row][env.traveler.col] = c.create_rectangle(env.traveler.col * col_width, env.traveler.row * row_height,
+                                                                                (env.traveler.col + 1) * col_width,
+                                                                                (env.traveler.row + 1) * row_height, fill="green")
                 c.update()
 
                 agent.learn(
@@ -205,12 +218,13 @@ if __name__ == '__main__':
 
                 cur_state = next_state
 
-                if reward != 0:
+                if reward > 800 or reward < -800:
+                    # if reward != 0:
                     break
 
-            if reward > 0:
+            if reward > 800:
                 successful_routines.append(step_counter)
-            elif reward < 0:
+            elif reward < -800:
                 failed_routines.append(step_counter)
 
             print(
