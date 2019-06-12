@@ -3,7 +3,6 @@ import sys
 
 import numpy as np
 import pandas as pd
-from MapEnv import Point
 
 
 class QLAgent:
@@ -16,16 +15,20 @@ class QLAgent:
 
     def choose_action(self, state):
         self.create_state_if_not_exists(state)
+        print(state)
+        temp = np.random.uniform()
 
-        if np.random.uniform() < self.epsilon:
+        if temp < self.epsilon:
             actions = self.q_table.loc[state, :]
             action = self.choose_best_action(actions)
-        else:
+        elif temp >= self.epsilon:
             action = np.random.choice(self.actions)
+
 
         return action
 
     def build_index(self, max_row, max_col):
+        from MapEnv import Point
         index = []
         for row in range(max_row):
             for col in range(max_col):
@@ -52,7 +55,7 @@ class QLAgent:
             )
 
     def not_finished(self, reward):
-        return reward == 0
+        return reward < 800 and reward > -800
 
     def choose_best_action(self, actions):
         q_table_cols = self.q_table.columns
@@ -61,13 +64,13 @@ class QLAgent:
 
         for idx in range(len(q_table_cols)):
             action_value = actions[idx]
-            q_table_col = q_table_cols[idx]
+            q_tabl_col = q_table_cols[idx]
 
             if action_value > max_action_value:
                 max_action_value = action_value
-                max_action_value_list = [q_table_col]
+                max_action_value_list = [q_tabl_col]
             elif action_value == max_action_value:
-                max_action_value_list.append(q_table_col)
+                max_action_value_list.append(q_tabl_col)
             else:
                 continue
 
