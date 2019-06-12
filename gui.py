@@ -21,8 +21,8 @@ class Operation(Enum):
 
 if __name__ == '__main__':
     # Global Variables
-    MAX_ROW = 10
-    MAX_COL = 10
+    MAX_ROW = 19
+    MAX_COL = 7
     # Traveler/ destination/ obstacles setup
     traveler = Point(-1, -1)
     destination = Point(-1, -1)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     currentMode = Operation.OBSTACLE
     # Create the window, a canvas and the mouse click event binding
     root = tk.Tk()
-    img = PhotoImage(file="evanston_crime_small.png")
+    img = PhotoImage(file="nyc_crime.png")
     c = tk.Canvas(root, width=img.width(), height=img.height(), borderwidth=5, background='white')
     c.create_image(0, 0, anchor=NW, image=img)
     c.pack()

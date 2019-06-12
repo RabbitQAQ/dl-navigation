@@ -15,8 +15,8 @@ if __name__ == '__main__':
     max_row = 19
     max_col = 7
     actions = [MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN]
-    worker = Point(3, 6)
-    treasure = Point(0, 5)
+    worker = Point(1, 6)
+    treasure = Point(2, 3)
     crime_low = [
         Point(0, 1),
         Point(0, 6),
