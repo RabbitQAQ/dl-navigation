@@ -6,18 +6,22 @@ import numpy as np
 from MapActions import MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN
 
 
-class MapEnv:
-    def __init__(self, max_row, max_col, traveler, destination, refresh_interval, obstacles=None):
+class MazeEnv:
+    def __init__(self, max_row, max_col, worker, treasure, crime_high, crime_low, crime_mid, crime_extreme, refresh_interval, obstacles=None,):
         self.max_row = max_row
         self.max_col = max_col
-        self.init_worker = traveler.clone()
-        self.worker = traveler
-        self.treasure = destination
+        self.init_worker = worker.clone()
+        self.worker = worker
+        self.treasure = treasure
+        self.crime_high = crime_high
+        self.crime_mid = crime_mid
+        self.crime_low = crime_low
+        self.crime_extreme = crime_extreme
         self.refresh_interval = refresh_interval
 
         if obstacles:
             for obstacle in obstacles:
-                if destination.equal(obstacle):
+                if treasure.equal(obstacle):
                     raise Exception('The treasure point is conflicted with an obstacle point')
             self.obstacles = obstacles
         else:
@@ -47,10 +51,22 @@ class MapEnv:
         state = self.worker.toString()
         reward = 0
         if self.worker.equal(self.treasure):
-            reward = 1
+            reward = 1000
+        for low in self.crime_low:
+            if self.worker.equal(low):
+                reward -= 30
+        for mid in self.crime_mid:
+            if self.worker.equal(mid):
+                reward -= 100
+        for high in self.crime_high:
+            if self.worker.equal(high):
+                reward -= 400
+        for extreme in self.crime_extreme:
+            if self.worker.equal(extreme):
+                reward -= 800
         for obstacle in self.obstacles:
             if self.worker.equal(obstacle):
-                reward = -1
+                reward = -1000
         return state, reward
 
     def reset(self):
@@ -63,7 +79,15 @@ class MapEnv:
         arr[self.treasure.row][self.treasure.col] = 8
         arr[self.worker.row][self.worker.col] = 1
         for obstacle in self.obstacles:
-            arr[obstacle.row][obstacle.col] = 4
+            arr[obstacle.row][obstacle.col] = 7
+        for low in self.crime_low:
+            arr[low.row][low.col] = -1
+        for mid in self.crime_mid:
+            arr[mid.row][mid.col] = -2
+        for high in self.crime_high:
+            arr[high.row][high.col] = -3
+        for extreme in self.crime_extreme:
+            arr[extreme.row][extreme.col] = -4
         print(arr)
         time.sleep(self.refresh_interval)
 
