@@ -18,14 +18,7 @@ class MapEnv:
         self.crime_low = crime_low
         self.crime_extreme = crime_extreme
         self.refresh_interval = refresh_interval
-
-        if obstacles:
-            for obstacle in obstacles:
-                if destination.equal(obstacle):
-                    raise Exception('The treasure point is conflicted with an obstacle point')
-            self.obstacles = obstacles
-        else:
-            self.obstacles = []
+        self.obstacles = obstacles
 
     def move(self, action):
         if action == MOVE_LEFT:
@@ -87,7 +80,6 @@ class MapEnv:
         for extreme in self.crime_extreme:
             arr[extreme.row][extreme.col] = -4
         print(arr)
-        #time.sleep(self.refresh_interval)
 
 
 class Point:
