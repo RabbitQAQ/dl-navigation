@@ -39,23 +39,35 @@ if __name__ == '__main__':
     currentMode = Operation.OBSTACLE
     # Create the window, a canvas and the mouse click event binding
     root = tk.Tk()
+    # Load map
     img = PhotoImage(file="nyc_crime.png")
     c = tk.Canvas(root, width=img.width(), height=img.height(), borderwidth=5, background='white')
     c.create_image(0, 0, anchor=NW, image=img)
-    c.pack()
+    # Add scroll bar
+    # scrollbar = Scrollbar(root)
+    # scrollbar.config(command=c.yview)
+    # scrollbar.pack(side=RIGHT, fill=Y)
+    # Add widgets aka buttons
+    f = tk.Frame(c)  # Create the frame which will hold the widgets
+    c.pack(side="left", fill="both", expand=True)
+    c.create_window(0, 0, window=f, anchor='nw')
+
     col_width = -1
     row_height = -1
     # Label of status
     statusLabel = StringVar()
-    Label(root, textvariable=statusLabel).pack()
+    Label(f, textvariable=statusLabel).pack()
     succeedLabel = StringVar()
-    Label(root, textvariable=succeedLabel).pack()
+    Label(f, textvariable=succeedLabel).pack()
     failedLabel = StringVar()
-    Label(root, textvariable=failedLabel).pack()
+    Label(f, textvariable=failedLabel).pack()
 
     statusLabel.set("Not Started")
     succeedLabel.set("Succeed Steps: ")
     failedLabel.set("Failed Steps: ")
+    # root.update()
+    # c.config(scrollregion=c.bbox("all"))
+
 
     def mark(event):
         global traveler
@@ -172,7 +184,6 @@ if __name__ == '__main__':
 
 
     def startLearningBtnHandler(event):
-        print("wow")
         refresh_interval = 0.01
         # Number of iterations
         episode = 200
